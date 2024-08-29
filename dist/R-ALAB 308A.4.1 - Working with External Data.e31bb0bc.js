@@ -12243,6 +12243,10 @@ exports.Axios = Axios;
 },{"./lib/axios.js":"node_modules/axios/lib/axios.js"}],"index.js":[function(require,module,exports) {
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.favourite = favourite;
 var Carousel = _interopRequireWildcard(require("./Carousel.js"));
 var _axios = _interopRequireDefault(require("axios"));
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
@@ -12267,126 +12271,17 @@ _axios.default.defaults.baseURL = "https://api.thecatapi.com/v1/";
 _axios.default.defaults.headers.common["x-api-key"] = API_KEY;
 
 ////         FECTCH           ////
-function initialLoad() {
-  return _initialLoad.apply(this, arguments);
-}
-function _initialLoad() {
-  _initialLoad = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-    var response, parseBreeds;
-    return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-      while (1) switch (_context2.prev = _context2.next) {
-        case 0:
-          _context2.prev = 0;
-          _context2.next = 3;
-          return fetch("https://api.thecatapi.com/v1/breeds/", {
-            headers: {
-              "x-api-key": API_KEY
-            }
-          });
-        case 3:
-          response = _context2.sent;
-          if (response.ok) {
-            _context2.next = 6;
-            break;
-          }
-          throw new Error("HTTP error! Status: ".concat(response.status));
-        case 6:
-          _context2.next = 8;
-          return response.json();
-        case 8:
-          parseBreeds = _context2.sent;
-          parseBreeds.forEach(function (breed) {
-            var optionEl = document.createElement("option");
-            optionEl.value = breed.id;
-            optionEl.textContent = breed.name;
-            breedSelect.appendChild(optionEl);
-          });
-          _context2.next = 15;
-          break;
-        case 12:
-          _context2.prev = 12;
-          _context2.t0 = _context2["catch"](0);
-          console.error("Error fetching breeds:", _context2.t0);
-        case 15:
-        case "end":
-          return _context2.stop();
-      }
-    }, _callee2, null, [[0, 12]]);
-  }));
-  return _initialLoad.apply(this, arguments);
-}
-breedSelect.addEventListener("change", /*#__PURE__*/function () {
-  var _ref = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee(e) {
-    var breedId, response, breedInfo, breed, carouselItem, placeholderImage, _carouselItem;
-    return _regeneratorRuntime().wrap(function _callee$(_context) {
-      while (1) switch (_context.prev = _context.next) {
-        case 0:
-          breedId = e.target.value;
-          if (breedId) {
-            _context.next = 3;
-            break;
-          }
-          return _context.abrupt("return");
-        case 3:
-          _context.prev = 3;
-          _context.next = 6;
-          return fetch("https://api.thecatapi.com/v1/images/search?breed_ids=".concat(breedId), {
-            headers: {
-              "x-api-key": API_KEY
-            }
-          });
-        case 6:
-          response = _context.sent;
-          if (response.ok) {
-            _context.next = 9;
-            break;
-          }
-          throw new Error("HTTP error! Status: ".concat(response.status));
-        case 9:
-          _context.next = 11;
-          return response.json();
-        case 11:
-          breedInfo = _context.sent;
-          breed = breedInfo[0].breeds[0];
-          infoDump.innerHTML = "\n    <h3>".concat(breed.name, "</h3>\n    <p><bold>Temperament:</bold> ").concat(breed.temperament, "</p>\n    <p><bold>Description:</bold> ").concat(breed.description, "</p>\n    <p><bold>Origin:</bold> ").concat(breed.origin, "</p>\n  ");
-          Carousel.clear();
-          if (breedInfo[0].url) {
-            carouselItem = Carousel.createCarouselItem(breedInfo[0].url, "Image 1", breedInfo[0].id);
-            Carousel.appendCarousel(carouselItem);
-          } else {
-            placeholderImage = "./";
-            _carouselItem = Carousel.createCarouselItem(placeholderImage, "Placeholder Image", "placeholder-id");
-            Carousel.appendCarousel(_carouselItem);
-          }
-          ;
-          Carousel.start();
-          _context.next = 24;
-          break;
-        case 20:
-          _context.prev = 20;
-          _context.t0 = _context["catch"](3);
-          console.error("Error fetching breed details:", _context.t0);
-          infoDump.innerHTML = "<p>Failed to load breed details. Please try again.</p>";
-        case 24:
-          Carousel.start();
-        case 25:
-        case "end":
-          return _context.stop();
-      }
-    }, _callee, null, [[3, 20]]);
-  }));
-  return function (_x) {
-    return _ref.apply(this, arguments);
-  };
-}());
-
-////      AXIOS    ////
-
 // async function initialLoad() {
 //   try {
-//     const response = await axios.get("breeds");
-//     console.log(response)
-//     const parseBreeds = response.data;
+//     const response = await fetch(`https://api.thecatapi.com/v1/breeds/`, {
+//       headers: {
+//         "x-api-key": API_KEY,
+//       },
+//     });
+//     if (!response.ok) {
+//       throw new Error(`HTTP error! Status: ${response.status}`);
+//     }
+//     const parseBreeds = await response.json();
 //     parseBreeds.forEach((breed) => {
 //       let optionEl = document.createElement("option");
 //       optionEl.value = breed.id;
@@ -12395,33 +12290,40 @@ breedSelect.addEventListener("change", /*#__PURE__*/function () {
 //     });
 //   } catch (error) {
 //     console.error("Error fetching breeds:", error);
-//   };
-// };
+//   }
+// }
 
 // breedSelect.addEventListener("change", async (e) => {
 //   const breedId = e.target.value;
 //   if (!breedId) return;
-
 //   try {
-//     const response = await axios.get(`images/search?breed_ids=${breedId}`, {
-//       onDownloadProgress: updateProgress,
-//     });
-//     const breedInfo = response.data[0];
-
+//     const response = await fetch(
+//       `https://api.thecatapi.com/v1/images/search?breed_ids=${breedId}`,
+//       {
+//         headers: {
+//           "x-api-key": API_KEY,
+//         },
+//       }
+//     );
+//     if (!response.ok) {
+//       throw new Error(`HTTP error! Status: ${response.status}`);
+//     }
+//     const breedInfo = await response.json();
+//     let breed = breedInfo[0].breeds[0];
 //     infoDump.innerHTML = `
-//       <h3>${breedInfo.breeds[0].name}</h3>
-//       <p><strong>Temperament:</strong> ${breedInfo.breeds[0].temperament}</p>
-//       <p><strong>Description:</strong> ${breedInfo.breeds[0].description}</p>
-//       <p><strong>Origin:</strong> ${breedInfo.breeds[0].origin}</p>
-//     `;
+//     <h3>${breed.name}</h3>
+//     <p><bold>Temperament:</bold> ${breed.temperament}</p>
+//     <p><bold>Description:</bold> ${breed.description}</p>
+//     <p><bold>Origin:</bold> ${breed.origin}</p>
+//   `;
 
 //     Carousel.clear();
 
-//     if (breedInfo.url) {
+//     if (breedInfo[0].url) {
 //       const carouselItem = Carousel.createCarouselItem(
-//         breedInfo.url,
+//         breedInfo[0].url,
 //         `Image 1`,
-//         breedInfo.id
+//         breedInfo[0].id
 //       );
 //       Carousel.appendCarousel(carouselItem);
 //     } else {
@@ -12439,120 +12341,239 @@ breedSelect.addEventListener("change", /*#__PURE__*/function () {
 //     infoDump.innerHTML =
 //       "<p>Failed to load breed details. Please try again.</p>";
 //   }
+//     Carousel.start();
 // });
 
-// axios.interceptors.request.use(
-//   (config) => {
-//     config.metadata = { startTime: new Date() };
-//     progressBar.style.width = "0%";
-//     document.body.style.cursor = "progress";
-//     console.log(`Request started at: ${config.metadata.startTime}`);
-//     return config;
-//   },
-//   (error) => {
-//     return Promise.reject(error);
-//   }
-// );
-
-// axios.interceptors.response.use(
-//   (response) => {
-//     const endTime = new Date();
-//     const duration = endTime - response.config.metadata.startTime;
-//     console.log(`Response received at: ${endTime}`);
-//     console.log(`Request duration: ${duration} ms`);
-//     document.body.style.cursor = "";
-//     return response;
-//   },
-//   (error) => {
-//     const endTime = new Date();
-//     const duration = endTime - error.config.metadata.startTime;
-//     console.log(`Response received at: ${endTime}`);
-//     console.log(`Request duration: ${duration} ms`);
-//     document.body.style.cursor = "";
-//     return Promise.reject(error);
-//   }
-// );
-
-// function updateProgress(event) {
-//   if (event.lengthComputable) {
-//     const percentComplete = Math.round((event.loaded / event.total) * 100);
-//     progressBar.style.width = `${percentComplete}%`;
-//     console.log("Progress Event:", event);
-//   };
-// };
-
-// export async function favourite(imgId) {
-//   try {
-//     const response = await axios.get(
-//       `https://api.thecatapi.com/v1/favourites`,
-//       {
-//         headers: {
-//           "x-api-key": API_KEY,
-//         },
-//       }
-//     );
-
-//     const favourite = response.data.find((fav) => fav.image.id === imgId);
-
-//     if (favourite) {
-//       await axios.delete(
-//         `https://api.thecatapi.com/v1/favourites/${favourite.id}`,
-//         {
-//           headers: {
-//             "x-api-key": API_KEY,
-//           },
-//         }
-//       );
-//       console.log(`Removed ${imgId} from favourites.`);
-//     } else {
-//       await axios.post(
-//         `https://api.thecatapi.com/v1/favourites`,
-//         {
-//           image_id: imgId,
-//         },
-//         {
-//           headers: {
-//             "x-api-key": API_KEY,
-//           },
-//         }
-//       );
-//       console.log(`Added ${imgId} to favourites.`);
-//     }
-//   } catch (error) {
-//     console.error("Error updating favourites:", error);
-//   };
-// };
-
-// async function getFavourites() {
-//   try {
-//     const response = await axios.get(
-//       "https://api.thecatapi.com/v1/favourites",
-//       {
-//         headers: {
-//           "x-api-key": API_KEY,
-//         },
-//       }
-//     );
-
-//     Carousel.clear();
-
-//     response.data.forEach((favourite) => {
-//       const carouselItem = Carousel.createCarouselItem(
-//         favourite.image.url,
-//         "Favourited Image",
-//         favourite.image.id
-//       );
-//       Carousel.appendCarousel(carouselItem);
-//     });
-
-//     Carousel.start();
-//   } catch (error) {
-//     console.error("Error fetching favourites:", error);
-//   };
-// };
-
-// getFavouritesBtn.addEventListener("click", getFavourites);
-
+////      AXIOS    ////
+function initialLoad() {
+  return _initialLoad.apply(this, arguments);
+}
+function _initialLoad() {
+  _initialLoad = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+    var response, parseBreeds;
+    return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+      while (1) switch (_context2.prev = _context2.next) {
+        case 0:
+          _context2.prev = 0;
+          _context2.next = 3;
+          return _axios.default.get("breeds");
+        case 3:
+          response = _context2.sent;
+          parseBreeds = response.data;
+          parseBreeds.forEach(function (breed) {
+            var optionEl = document.createElement("option");
+            optionEl.value = breed.id;
+            optionEl.textContent = breed.name;
+            breedSelect.appendChild(optionEl);
+          });
+          _context2.next = 11;
+          break;
+        case 8:
+          _context2.prev = 8;
+          _context2.t0 = _context2["catch"](0);
+          console.error("Error fetching breeds:", _context2.t0);
+        case 11:
+          ;
+        case 12:
+        case "end":
+          return _context2.stop();
+      }
+    }, _callee2, null, [[0, 8]]);
+  }));
+  return _initialLoad.apply(this, arguments);
+}
+;
+breedSelect.addEventListener("change", /*#__PURE__*/function () {
+  var _ref = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee(e) {
+    var breedId, response, breedInfo, carouselItem, placeholderImage, _carouselItem;
+    return _regeneratorRuntime().wrap(function _callee$(_context) {
+      while (1) switch (_context.prev = _context.next) {
+        case 0:
+          breedId = e.target.value;
+          if (breedId) {
+            _context.next = 3;
+            break;
+          }
+          return _context.abrupt("return");
+        case 3:
+          _context.prev = 3;
+          _context.next = 6;
+          return _axios.default.get("images/search?breed_ids=".concat(breedId), {
+            onDownloadProgress: updateProgress
+          });
+        case 6:
+          response = _context.sent;
+          breedInfo = response.data[0];
+          infoDump.innerHTML = "\n      <h3>".concat(breedInfo.breeds[0].name, "</h3>\n      <p><strong>Temperament:</strong> ").concat(breedInfo.breeds[0].temperament, "</p>\n      <p><strong>Description:</strong> ").concat(breedInfo.breeds[0].description, "</p>\n      <p><strong>Origin:</strong> ").concat(breedInfo.breeds[0].origin, "</p>\n    ");
+          Carousel.clear();
+          if (breedInfo.url) {
+            carouselItem = Carousel.createCarouselItem(breedInfo.url, "Image 1", breedInfo.id);
+            Carousel.appendCarousel(carouselItem);
+          } else {
+            placeholderImage = "./";
+            _carouselItem = Carousel.createCarouselItem(placeholderImage, "Placeholder Image", "placeholder-id");
+            Carousel.appendCarousel(_carouselItem);
+          }
+          ;
+          Carousel.start();
+          _context.next = 19;
+          break;
+        case 15:
+          _context.prev = 15;
+          _context.t0 = _context["catch"](3);
+          console.error("Error fetching breed details:", _context.t0);
+          infoDump.innerHTML = "<p>Failed to load breed details. Please try again.</p>";
+        case 19:
+        case "end":
+          return _context.stop();
+      }
+    }, _callee, null, [[3, 15]]);
+  }));
+  return function (_x) {
+    return _ref.apply(this, arguments);
+  };
+}());
+_axios.default.interceptors.request.use(function (config) {
+  config.metadata = {
+    startTime: new Date()
+  };
+  progressBar.style.width = "0%";
+  document.body.style.cursor = "progress";
+  console.log("Request started at: ".concat(config.metadata.startTime));
+  return config;
+}, function (error) {
+  return Promise.reject(error);
+});
+_axios.default.interceptors.response.use(function (response) {
+  var endTime = new Date();
+  var duration = endTime - response.config.metadata.startTime;
+  console.log("Response received at: ".concat(endTime));
+  console.log("Request duration: ".concat(duration, " ms"));
+  document.body.style.cursor = "";
+  return response;
+}, function (error) {
+  var endTime = new Date();
+  var duration = endTime - error.config.metadata.startTime;
+  console.log("Response received at: ".concat(endTime));
+  console.log("Request duration: ".concat(duration, " ms"));
+  document.body.style.cursor = "";
+  return Promise.reject(error);
+});
+function updateProgress(event) {
+  if (event.lengthComputable) {
+    var percentComplete = Math.round(event.loaded / event.total * 100);
+    progressBar.style.width = "".concat(percentComplete, "%");
+    console.log("Progress Event:", event);
+  }
+  ;
+}
+;
+function favourite(_x2) {
+  return _favourite.apply(this, arguments);
+}
+function _favourite() {
+  _favourite = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3(imgId) {
+    var response, _favourite2;
+    return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+      while (1) switch (_context3.prev = _context3.next) {
+        case 0:
+          _context3.prev = 0;
+          _context3.next = 3;
+          return _axios.default.get("https://api.thecatapi.com/v1/favourites", {
+            headers: {
+              "x-api-key": API_KEY
+            }
+          });
+        case 3:
+          response = _context3.sent;
+          _favourite2 = response.data.find(function (fav) {
+            return fav.image.id === imgId;
+          });
+          if (!_favourite2) {
+            _context3.next = 11;
+            break;
+          }
+          _context3.next = 8;
+          return _axios.default.delete("https://api.thecatapi.com/v1/favourites/".concat(_favourite2.id), {
+            headers: {
+              "x-api-key": API_KEY
+            }
+          });
+        case 8:
+          console.log("Removed ".concat(imgId, " from favourites."));
+          _context3.next = 14;
+          break;
+        case 11:
+          _context3.next = 13;
+          return _axios.default.post("https://api.thecatapi.com/v1/favourites", {
+            image_id: imgId
+          }, {
+            headers: {
+              "x-api-key": API_KEY
+            }
+          });
+        case 13:
+          console.log("Added ".concat(imgId, " to favourites."));
+        case 14:
+          _context3.next = 19;
+          break;
+        case 16:
+          _context3.prev = 16;
+          _context3.t0 = _context3["catch"](0);
+          console.error("Error updating favourites:", _context3.t0);
+        case 19:
+          ;
+        case 20:
+        case "end":
+          return _context3.stop();
+      }
+    }, _callee3, null, [[0, 16]]);
+  }));
+  return _favourite.apply(this, arguments);
+}
+;
+function getFavourites() {
+  return _getFavourites.apply(this, arguments);
+}
+function _getFavourites() {
+  _getFavourites = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+    var response;
+    return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+      while (1) switch (_context4.prev = _context4.next) {
+        case 0:
+          _context4.prev = 0;
+          _context4.next = 3;
+          return _axios.default.get("https://api.thecatapi.com/v1/favourites", {
+            headers: {
+              "x-api-key": API_KEY
+            }
+          });
+        case 3:
+          response = _context4.sent;
+          Carousel.clear();
+          response.data.forEach(function (favourite) {
+            var carouselItem = Carousel.createCarouselItem(favourite.image.url, "Favourited Image", favourite.image.id);
+            Carousel.appendCarousel(carouselItem);
+          });
+          Carousel.start();
+          _context4.next = 12;
+          break;
+        case 9:
+          _context4.prev = 9;
+          _context4.t0 = _context4["catch"](0);
+          console.error("Error fetching favourites:", _context4.t0);
+        case 12:
+          ;
+        case 13:
+        case "end":
+          return _context4.stop();
+      }
+    }, _callee4, null, [[0, 9]]);
+  }));
+  return _getFavourites.apply(this, arguments);
+}
+;
+getFavouritesBtn.addEventListener("click", getFavourites);
 initialLoad();
 },{"./Carousel.js":"Carousel.js","axios":"node_modules/axios/index.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
@@ -12579,7 +12600,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50931" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51480" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
